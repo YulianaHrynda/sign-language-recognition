@@ -1,7 +1,7 @@
 # Sign Language Recognition
 
 Authors:\
-Pavlosiuk Roman - https://github.com/UCUgllekk \
+Pavlosiuk Roman - https://github.com/gllekkoff \
 Hrynda Yuliana - https://github.com/YulianaHrynda \
 Denysova Iryna - https://github.com/Shnapa
 
