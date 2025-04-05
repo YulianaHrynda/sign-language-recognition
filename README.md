@@ -18,7 +18,7 @@ source myenv/bin/activate
 
 If you are using Windows:
 ```sh
-source myenv/bin/activate.bat
+myenv/bin/activate
 ```
 
 Then install needed libraries for project:
