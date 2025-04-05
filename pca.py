@@ -43,7 +43,13 @@ class PCA:
             self.components.append(eigenvector)
 
     def transform(self, X):
-        X_centered = [[X[i][j] - self.mean[j] for j in range(len(X[0]))] for i in range(len(X))]
+        if len(X[0]) != len(self.mean):
+            raise ValueError(f"Expected input with {len(self.mean)} features, but got {len(X[0])}")
+
+        X_centered = [
+            [X[i][j] - self.mean[j] for j in range(len(self.mean))]
+            for i in range(len(X))
+        ]        
         projections = []
         for x in X_centered:
             proj = [sum(x[i] * comp[i] for i in range(len(x))) for comp in self.components]

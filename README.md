@@ -31,3 +31,14 @@ pip install mediapipe
 ```sh
 pip install opencv-python
 ```
+
+### How to run
+
+In order to run project, after completing steps described above use this:
+```sh
+python3 main.py
+```
+
+### How to stop running
+
+To stop code running simply press "q" button, or press Ctrl+C or Ctrl+D in terminal
