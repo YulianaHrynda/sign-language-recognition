@@ -1,9 +1,9 @@
 # Sign Language Recognition
 
 Authors:\
-Pavlosiuk Roman: \
-Hrynda Yuliana: \
-Denysova Iryna:
+Pavlosiuk Roman - https://github.com/UCUgllekk\
+Hrynda Yuliana - https://github.com/YulianaHrynda\
+Denysova Iryna - https://github.com/Shnapa\
 
 ### Installation
 To use our project you need to create venv and activate venv:
