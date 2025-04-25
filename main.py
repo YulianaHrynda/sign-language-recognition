@@ -5,14 +5,11 @@ from hand_tracking import get_hand_landmarks, normalize_landmarks
 from features import extract_feature_vector
 from pca import PCA
 from kNN import kNN
-from feature_extractor import extract_features_and_save_to_json
 
-import json
 with open("features_and_labels.json", "r") as f:
     data = json.load(f)
 
-X_train = [feature for _, feature in data['features'].items()]
-y_train = data['labels']
+X_train, y_train = data["features"], data["labels"]
 
 pca = PCA(n_components=2)
 pca.fit(X_train)
@@ -64,8 +61,8 @@ while True:
     else:
         prediction = "no hand"
 
-    cv2.putText(frame, f"Gesture: {prediction}", (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+    # cv2.putText(frame, f"Gesture: {prediction}", (10, 30),
+    #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
 
     cv2.imshow("Real-Time Gesture Recognition", frame)
 
