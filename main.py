@@ -14,7 +14,7 @@ X_train, y_train = data["features"], data["labels"]
 pca = PCA(n_components=3)
 pca.fit(X_train)
 X_train_pca = pca.transform(X_train)
-q
+
 knn = kNN(k=5)
 knn.fit(X_train_pca, y_train)
 
