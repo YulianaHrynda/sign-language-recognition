@@ -1,32 +1,28 @@
 import cv2
-from hand_tracking import get_hand_landmarks, normalize_landmarks
-from features import extract_feature_vector
-from pca import PCA
-from kNN import kNN
-X_train = [
-    [2.51, 2.85, 2.94, 2.97, 2.90, 0.10, 0.09, 0.22, 0.43, 0.37],
-    [2.48, 2.81, 2.92, 2.95, 2.88, 0.12, 0.08, 0.21, 0.42, 0.36],
-    [2.01, 1.90, 1.95, 2.00, 2.02, 0.05, 0.07, 0.12, 0.25, 0.20]
-]
-y_train = ["peace", "fuck", "fist"]
+import torch
+import torchvision.transforms as transforms
+from model import SimpleCNN
+from hand_tracking import get_hand_landmarks
 
-pca = PCA(n_components=2)
-pca.fit(X_train)
-X_train_pca = pca.transform(X_train)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = SimpleCNN(num_classes=29)
+model.load_state_dict(torch.load("asl_model.pth", map_location=device))
+model.to(device)
+model.eval()
 
-knn = kNN(k=2)
-knn.fit(X_train_pca, y_train)
+transform = transforms.Compose([
+    transforms.Resize((200, 200)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.5]*3, std=[0.5]*3)
+])
 
-CONNECTIONS = [
-    (0, 1), (1, 2), (2, 3), (3, 4),
-    (0, 5), (5, 6), (6, 7), (7, 8),
-    (0, 9), (9, 10), (10, 11), (11, 12),
-    (0, 13), (13, 14), (14, 15), (15, 16),
-    (0, 17), (17, 18), (18, 19), (19, 20)
-]
+LABELS = sorted([
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+    "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "del", "nothing", "space"
+])
 
 cap = cv2.VideoCapture(0)
-last_prediction = "No hand"
 
 while True:
     ret, frame = cap.read()
@@ -37,31 +33,34 @@ while True:
     h, w, _ = frame.shape
     landmarks = get_hand_landmarks(frame)
 
+    prediction = "no hand"
     if landmarks:
-        norm_landmarks = normalize_landmarks(landmarks)
-        features = extract_feature_vector(norm_landmarks)
-        features_pca = pca.transform([features])[0]
-        prediction = knn.predict(features_pca)
+        xs = [int(pt[0] * w) for pt in landmarks]
+        ys = [int(pt[1] * h) for pt in landmarks]
+        x_min, x_max = max(min(xs) - 20, 0), min(max(xs) + 20, w)
+        y_min, y_max = max(min(ys) - 20, 0), min(max(ys) + 20, h)
+        hand_roi = frame[y_min:y_max, x_min:x_max]
 
-        for idx, lm in enumerate(landmarks):
-            x = int(lm[0] * w)
-            y = int(lm[1] * h)
-            cv2.circle(frame, (x, y), 7, (0, 0, 255), -1)
+        if hand_roi.size > 0:
+            try:
+                input_image = cv2.cvtColor(hand_roi, cv2.COLOR_BGR2RGB)
+                input_tensor = transform(Image.fromarray(input_image)).unsqueeze(0).to(device)
+                with torch.no_grad():
+                    output = model(input_tensor)
+                    prediction = LABELS[output.argmax().item()]
+            except Exception as e:
+                print("Error processing frame:", e)
 
-        for i, j in CONNECTIONS:
-            x1, y1 = int(landmarks[i][0] * w), int(landmarks[i][1] * h)
-            x2, y2 = int(landmarks[j][0] * w), int(landmarks[j][1] * h)
-            cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-
-    prediction = "no hand" if not landmarks else prediction
+        for x, y in zip(xs, ys):
+            cv2.circle(frame, (x, y), 5, (0, 0, 255), -1)
+        cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
 
     cv2.putText(frame, f"Gesture: {prediction}", (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
 
-    
     cv2.imshow("Real-Time Gesture Recognition", frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-    
+
 cap.release()
 cv2.destroyAllWindows()
