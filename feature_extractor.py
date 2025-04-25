@@ -68,7 +68,6 @@ def extract_features_and_save_to_json(dataset_path, output_filename="features_an
 
             if img_path.endswith(('.jpg', '.jpeg', '.png')):
                 frame = cv2.imread(img_path)
-                frame = cv2.flip(frame, 1)  # Flip the image horizontally
 
                 # Preprocess the image to adjust lighting and contrast
                 frame = preprocess_image(frame)

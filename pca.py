@@ -1,5 +1,6 @@
 import math
-from vector import mean_vector
+import random
+from vector import mean_vector, vector_subtract, vector_magnitude, vector_dot, scalar_divide
 
 def transpose(matrix):
     return list(map(list, zip(*matrix)))
@@ -7,35 +8,30 @@ def transpose(matrix):
 def covariance_matrix(X):
     n = len(X)
     m = len(X[0])
-    mean = mean_vector(X)
-    cov = [[0 for _ in range(m)] for _ in range(m)]
-
+    cov = [[0.0]*m for _ in range(m)]
     for i in range(m):
         for j in range(m):
+            s = 0.0
             for k in range(n):
-                cov[i][j] += (X[k][i] - mean[i]) * (X[k][j] - mean[j])
-            cov[i][j] /= (n - 1)
+                s += X[k][i]*X[k][j]
+            cov[i][j] = s/(n-1)
     return cov
 
-import numpy as np
-
-def power_iteration(A, tol=1e-6):
-    A = np.asarray(A)
-    v = np.random.rand(A.shape[1])
-    v /= np.linalg.norm(v)
-
-    while True:
-        w = A.dot(v)
-        w_norm = np.linalg.norm(w)
-        if w_norm == 0:
-            return v
-        v_next = w / w_norm
-        
-        if np.linalg.norm(v_next - v) < tol:
-            return v_next
-        
+def power_iteration(matrix, tol=1e-6, max_iter=10000):
+    n = len(matrix)
+    v = [random.random() for _ in range(n)]
+    v = scalar_divide(v, vector_magnitude(v))
+    for _ in range(max_iter):
+        w = [vector_dot(row, v) for row in matrix]
+        norm_w = vector_magnitude(w)
+        if norm_w == 0:
+            break
+        v_next = scalar_divide(w, norm_w)
+        if vector_magnitude(vector_subtract(v_next, v)) < tol:
+            v = v_next
+            break
         v = v_next
-
+    return scalar_divide(v, vector_magnitude(v))
 
 class PCA:
     def __init__(self, n_components=1):
@@ -45,20 +41,25 @@ class PCA:
 
     def fit(self, X):
         self.mean = mean_vector(X)
-        X_centered = [[X[i][j] - self.mean[j] for j in range(len(X[0]))] for i in range(len(X))]
-        cov = covariance_matrix(X_centered)
-
+        X_centered = [[x_ij - self.mean[j] for j, x_ij in enumerate(x_i)] for x_i in X]
+        C = covariance_matrix(X_centered)
+        self.components = []
         for _ in range(self.n_components):
-            eigenvector = power_iteration(cov)
-            self.components.append(eigenvector)
+            v = power_iteration(C)
+            v = scalar_divide(v, vector_magnitude(v))
+            self.components.append(v)
+            Cv = [vector_dot(row, v) for row in C]
+            lam = vector_dot(v, Cv)
+            m = len(C)
+            for i in range(m):
+                for j in range(m):
+                    C[i][j] -= lam*v[i]*v[j]
 
     def transform(self, X):
         if len(X[0]) != len(self.mean):
-            raise ValueError(f"Expected input with {len(self.mean)} features, but got {len(X[0])}")
-
-        X_centered = [[X[i][j] - self.mean[j] for j in range(len(self.mean))] for i in range(len(X)) ]        
+            raise ValueError(f"Expected {len(self.mean)} features, got {len(X[0])}")
+        X_centered = [[x_ij - self.mean[j] for j, x_ij in enumerate(x_i)] for x_i in X]
         projections = []
         for x in X_centered:
-            proj = [sum(x[i] * comp[i] for i in range(len(x))) for comp in self.components]
-            projections.append(proj)
+            projections.append([vector_dot(x, comp) for comp in self.components])
         return projections

@@ -1,8 +1,5 @@
-import math
 from collections import Counter
-
-def euclidean_distance(v1, v2):
-    return math.sqrt(sum((v1[i] - v2[i]) ** 2 for i in range(len(v1))))
+from vector import *
 
 class kNN:
     def __init__(self, k=3):
@@ -17,7 +14,7 @@ class kNN:
     def predict(self, x_test):
         distances = []
         for i in range(len(self.X_train)):
-            dist = euclidean_distance(self.X_train[i], x_test)
+            dist = distance(self.X_train[i], x_test)
             distances.append((dist, self.y_train[i]))
 
         distances.sort()
