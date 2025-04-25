@@ -7,3 +7,5 @@
 /.mypy_cache
 /.pytest_cache
 /archive
+/venv
+/dataset
