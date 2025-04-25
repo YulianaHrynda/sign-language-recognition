@@ -15,7 +15,7 @@ pca = PCA(n_components=2)
 pca.fit(X_train)
 X_train_pca = pca.transform(X_train)
 
-knn = kNN(k=9)
+knn = kNN(k=3)
 knn.fit(X_train_pca, y_train)
 
 CONNECTIONS = [
@@ -62,8 +62,8 @@ while True:
     else:
         prediction = "no hand"
 
-    cv2.putText(frame, f"Gesture: {prediction}", (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+    # cv2.putText(frame, f"Gesture: {prediction}", (10, 30),
+    #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
 
     cv2.imshow("Real-Time Gesture Recognition", frame)
 
