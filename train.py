@@ -51,7 +51,7 @@ def main():
     path = kagglehub.dataset_download("grassknoted/asl-alphabet")
     data_dir = os.path.join(path, "asl_alphabet_train")  # contains class folders
 
-    num_epochs = 10
+    num_epochs = 3
     batch_size = 32
     learning_rate = 0.0005
     num_classes = 29
@@ -93,3 +93,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
