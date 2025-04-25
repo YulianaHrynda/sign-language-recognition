@@ -3,3 +3,6 @@
 /.vscode
 /.idea
 /.DS_Store
+/.ropeproject
+/.mypy_cache
+/.pytest_cache

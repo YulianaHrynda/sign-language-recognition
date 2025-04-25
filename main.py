@@ -8,7 +8,7 @@ X_train = [
     [2.48, 2.81, 2.92, 2.95, 2.88, 0.12, 0.08, 0.21, 0.42, 0.36],
     [2.01, 1.90, 1.95, 2.00, 2.02, 0.05, 0.07, 0.12, 0.25, 0.20]
 ]
-y_train = ["peace", "peace", "fist"]
+y_train = ["peace", "fuck", "fist"]
 
 pca = PCA(n_components=2)
 pca.fit(X_train)
@@ -40,8 +40,6 @@ while True:
     if landmarks:
         norm_landmarks = normalize_landmarks(landmarks)
         features = extract_feature_vector(norm_landmarks)
-        print("Features:", features)
-        print("Length:", len(features))
         features_pca = pca.transform([features])[0]
         prediction = knn.predict(features_pca)
 
