@@ -6,3 +6,4 @@
 /.ropeproject
 /.mypy_cache
 /.pytest_cache
+/.env
