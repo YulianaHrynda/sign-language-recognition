@@ -5,20 +5,17 @@ from hand_tracking import get_hand_landmarks, normalize_landmarks
 from features import extract_feature_vector
 from pca import PCA
 from kNN import kNN
-from feature_extractor import extract_features_and_save_to_json
 
-import json
 with open("features_and_labels.json", "r") as f:
     data = json.load(f)
 
-X_train = [feature for _, feature in data['features'].items()]
-y_train = data['labels']
+X_train, y_train = data["features"], data["labels"]
 
 pca = PCA(n_components=2)
 pca.fit(X_train)
 X_train_pca = pca.transform(X_train)
 
-knn = kNN(k=3)
+knn = kNN(k=9)
 knn.fit(X_train_pca, y_train)
 
 CONNECTIONS = [
