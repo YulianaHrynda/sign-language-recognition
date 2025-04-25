@@ -11,11 +11,11 @@ with open("features_and_labels.json", "r") as f:
 
 X_train, y_train = data["features"], data["labels"]
 
-pca = PCA(n_components=2)
+pca = PCA(n_components=3)
 pca.fit(X_train)
 X_train_pca = pca.transform(X_train)
-
-knn = kNN(k=3)
+q
+knn = kNN(k=5)
 knn.fit(X_train_pca, y_train)
 
 CONNECTIONS = [
@@ -43,10 +43,7 @@ while True:
         features = extract_feature_vector(norm_landmarks)
 
         features_pca = pca.transform([features])[0]
-        gesture = knn.predict(features_pca)
-
-        cv2.putText(frame, f"Gesture: {gesture}", (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        prediction = knn.predict(features_pca)
 
         for idx, lm in enumerate(landmarks):
             x = int(lm[0] * w)
@@ -61,8 +58,8 @@ while True:
     else:
         prediction = "no hand"
 
-    # cv2.putText(frame, f"Gesture: {prediction}", (10, 30),
-    #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+    cv2.putText(frame, f"Gesture: {prediction}", (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
 
     cv2.imshow("Real-Time Gesture Recognition", frame)
 
