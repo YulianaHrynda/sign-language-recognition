@@ -17,15 +17,25 @@ def covariance_matrix(X):
             cov[i][j] /= (n - 1)
     return cov
 
-def power_iteration(matrix, num_iter=100):
-    n = len(matrix)
-    b_k = [1.0 for _ in range(n)]
+import numpy as np
 
-    for _ in range(num_iter):
-        b_k1 = [sum(matrix[i][j] * b_k[j] for j in range(n)) for i in range(n)]
-        norm = math.sqrt(sum(x ** 2 for x in b_k1))
-        b_k = [x / norm for x in b_k1]
-    return b_k
+def power_iteration(A, tol=1e-6):
+    A = np.asarray(A)
+    v = np.random.rand(A.shape[1])
+    v /= np.linalg.norm(v)
+
+    while True:
+        w = A.dot(v)
+        w_norm = np.linalg.norm(w)
+        if w_norm == 0:
+            return v
+        v_next = w / w_norm
+        
+        if np.linalg.norm(v_next - v) < tol:
+            return v_next
+        
+        v = v_next
+
 
 class PCA:
     def __init__(self, n_components=1):
