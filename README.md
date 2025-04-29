@@ -1,6 +1,6 @@
 # Sign Language Recognition
 Real-time sign language letter recognition using computer vision, PCA, and k-NN.
-The system can build sentences based on detected gestures, including whitespace recognition ("space", "del" gestures).
+The system can build sentences based on detected gestures, including whitespace recognition ("space" gestures) and deleting recognition ("del" gestures).
 
 Authors:\
 Pavlosiuk Roman - https://github.com/gllekkoff \
