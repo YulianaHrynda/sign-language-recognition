@@ -1,6 +1,7 @@
 import os
 import cv2
 import json
+import time
 from hand_tracking import get_hand_landmarks, normalize_landmarks
 from features import extract_feature_vector
 from pca import PCA
@@ -28,7 +29,10 @@ CONNECTIONS = [
 
 cap = cv2.VideoCapture(0)
 
-last_prediction = "No hand"
+last_char = None
+char_start_time = None
+sentence = ""
+display_threshold = 1
 
 while True:
     ret, frame = cap.read()
@@ -45,6 +49,21 @@ while True:
         features_pca = pca.transform([features])[0]
         prediction = knn.predict(features_pca)
 
+        if prediction == last_char:
+            elapsed = time.time() - char_start_time
+            if elapsed > display_threshold:
+                if prediction == "space":
+                    sentence += ' '
+                elif prediction == "del":
+                    sentence = sentence[:-1]
+                else:
+                    sentence += prediction
+                last_char = None
+                char_start_time = None
+        else:
+            last_char = prediction
+            char_start_time = time.time()
+
         for idx, lm in enumerate(landmarks):
             x = int(lm[0] * w)
             y = int(lm[1] * h)
@@ -57,9 +76,14 @@ while True:
 
     else:
         prediction = "no hand"
+        last_char = None
+        char_start_time = None
 
     cv2.putText(frame, f"Gesture: {prediction}", (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+
+    cv2.putText(frame, f"Sentence: {sentence}", (10, 70),
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
     cv2.imshow("Real-Time Gesture Recognition", frame)
 
