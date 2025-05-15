@@ -12,7 +12,7 @@ def adjust_gamma(image, gamma=1.0):
     return cv2.LUT(image, table)
 
 def equalize_histogram(image):
-    if len(image.shape) == 3:  # If the image is in color
+    if len(image.shape) == 3:
         yuv = cv2.cvtColor(image, cv2.COLOR_BGR2YUV)
         yuv[:,:,0] = cv2.equalizeHist(yuv[:,:,0])
         return cv2.cvtColor(yuv, cv2.COLOR_YUV2BGR)
@@ -20,13 +20,13 @@ def equalize_histogram(image):
         return cv2.equalizeHist(image)
 
 def preprocess_image(image):
-    image = equalize_histogram(image)  # Enhance contrast
-    image = adjust_gamma(image, gamma=1.2)  # Adjust brightness
+    image = equalize_histogram(image)
+    image = adjust_gamma(image, gamma=1.2)
     return image
 
 def extract_features_and_save_to_json(dataset_path, output_filename="features_and_labels.json"):
-    features_list = []  # List to store all features
-    labels_list = []  # List to store corresponding labels
+    features_list = []
+    labels_list = []
 
     for label in tqdm(os.listdir(dataset_path), desc="Processing Directories"):
         label_path = os.path.join(dataset_path, label)
